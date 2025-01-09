@@ -1,0 +1,344 @@
+{{ header }}{{ column_left }}
+
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <button type="submit" form="form-sensebank" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+                <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+            </div>
+            <h1>{{ heading_title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_settings }}</h3>
+            </div>
+            <div class="panel-body">
+                <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-sensebank" class="form-horizontal">
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="payment_sensebank_status">
+                            {{ entry_status }}
+                        </label>
+
+                        <div class="col-sm-9">
+                            <select name="payment_sensebank_status" id="payment_sensebank_status" class="form-control">
+                                {% if payment_sensebank_status %}
+                                    <option value="1" selected="selected">{{ status_enabled }}</option>
+                                    <option value="0">{{ status_disabled }}</option>
+                                {% else %}
+                                    <option value="1">{{ status_enabled }}</option>
+                                    <option value="0" selected="selected">{{ status_disabled }}</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+
+
+{% if api_version == 2 %}
+                <!-- token -->
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="">
+                        {{ entry_merchantToken }}
+                    </label>
+                    <div class="col-sm-9">
+                        <input type="text" name="payment_sensebank_merchantToken" value="{{ payment_sensebank_merchantToken }}" class="form-control" />
+                    </div>
+                </div>
+{% else %}
+                    <!-- login >> {{ api_version }} -->
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="">
+                            {{ entry_merchantLogin }}
+                        </label>
+                        <div class="col-sm-9">
+                            <input type="text" name="payment_sensebank_merchantLogin" value="{{ payment_sensebank_merchantLogin }}" class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- pass -->
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="">
+                            {{ entry_merchantPassword }}
+                        </label>
+                        <div class="col-sm-9">
+                            <input type="password" name="payment_sensebank_merchantPassword" value="{{ payment_sensebank_merchantPassword }}" class="form-control" />
+                        </div>
+                    </div>
+{% endif %}
+
+                    <!-- mode -->
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">
+                            {{ entry_mode }}
+                        </label>
+                        <div class="col-sm-9">
+                            <select name="payment_sensebank_mode" class="form-control">
+                                <option value="test" {{ payment_sensebank_mode  == 'test' ? 'selected="selected"' : '' }}>{{ mode_test }}</option>
+                                <option value="prod" {{ payment_sensebank_mode  == 'prod' ? 'selected="selected"' : '' }}>{{ mode_prod }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {% if (enable_sensebank_cacert) %}
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">
+                                {{ entry_enable_sensebank_cacert }}
+                            </label>
+                            <div class="col-sm-9">
+                                <select name="payment_sensebank_enable_sensebank_cacert" class="form-control">
+                                    <option value="1" {{ payment_sensebank_enable_sensebank_cacert  == 1 ? 'selected="selected"' : '' }}>{{ sensebank_cacert_enabled }}</option>
+                                    <option value="0" {{ payment_sensebank_enable_sensebank_cacert  == 0 ? 'selected="selected"' : '' }}>{{ sensebank_cacert_disabled }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- staging -->
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">
+                            {{ entry_stage }}
+                        </label>
+                        <div class="col-sm-9">
+                            <select name="payment_sensebank_stage" class="form-control">
+                                <option value="one" {{ payment_sensebank_stage  == 'one' ? 'selected="selected"' : '' }}>{{ stage_one }}</option>
+                                <option value="two" {{ payment_sensebank_stage  == 'two' ? 'selected="selected"' : '' }}>{{ stage_two }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="input-order-status-before">{{ entry_order_status_before }}</label>
+                        <div class="col-sm-9">
+                            <select name="payment_sensebank_order_status_before_id" id="input-order-status-before" class="form-control">
+                                {% for order_status in order_statuses %}
+                                    {% if order_status.order_status_id == payment_sensebank_order_status_before_id %}
+                                        <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                                    {% else %}
+                                        <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="input-order-status-completed">{{ entry_order_status_completed }}</label>
+                        <div class="col-sm-9">
+                            <select name="payment_sensebank_order_status_completed_id" id="input-order-status-completed" class="form-control">
+                                {% for order_status in order_statuses %}
+
+                                    {% if order_status.order_status_id == payment_sensebank_order_status_completed_id %}
+                                        <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                                    {% else %}
+                                        <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+{% if (enable_refund_options) %}
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="input-order-status-reversed">{{ entry_order_status_reversed }}</label>
+                        <div class="col-sm-9">
+                            <select name="payment_sensebank_order_status_reversed_id" id="input-order-status-reversed" class="form-control">
+                                {% for order_status in order_statuses %}
+
+                                    {% if order_status.order_status_id == payment_sensebank_order_status_reversed_id %}
+                                        <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                                    {% else %}
+                                        <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="input-order-status-refunded">{{ entry_order_status_refunded }}</label>
+                        <div class="col-sm-9">
+                            <select name="payment_sensebank_order_status_refunded_id" id="input-order-status-refunded" class="form-control">
+                                {% for order_status in order_statuses %}
+
+                                    {% if order_status.order_status_id == payment_sensebank_order_status_refunded_id %}
+                                        <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                                    {% else %}
+                                        <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+{% endif %}
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">
+                            {{ entry_currency }}
+                        </label>
+                        <div class="col-sm-9">
+                            <select name="payment_sensebank_currency" class="form-control">
+                                {% for currency in currency_list %}
+                                    <option value="{{ currency.numeric }}" {{ currency.numeric  == payment_sensebank_currency ? 'selected="selected"' : '' }}>
+                                        {{ currency.numeric  == 0 ? currency.alphabetic : currency.alphabetic ~ ' (' ~ currency.numeric ~ ')' }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+{% if (enable_cart_options) %}
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">
+                            {{ entry_ofdStatus }}
+                        </label>
+                        <div class="col-sm-9">
+                            <select name="payment_sensebank_ofd_status" class="form-control">
+                                <option value="1" {{ payment_sensebank_ofd_status  == 1 ? 'selected="selected"' : '' }}>{{ entry_ofd_enabled }}</option>
+                                <option value="0" {{ payment_sensebank_ofd_status  == 0 ? 'selected="selected"' : '' }}>{{ entry_ofd_disabled }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">
+                            {{ entry_taxSystem }}
+                        </label>
+                        <div class="col-sm-9">
+                            <select name="payment_sensebank_taxSystem" class="form-control">
+                                {% for taxSystem in taxSystem_list %}
+                                <option value="{{ taxSystem.numeric }}" {{ taxSystem.numeric  == payment_sensebank_taxSystem ? 'selected="selected"' : '' }}>
+                                {{ taxSystem.numeric  == 0 ? taxSystem.alphabetic : taxSystem.alphabetic }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">
+                            {{ entry_taxType }}
+                        </label>
+                        <div class="col-sm-9">
+                            <select name="payment_sensebank_taxType" class="form-control">
+                                {% for taxType in taxType_list %}
+                                <option value="{{ taxType.numeric }}" {{ taxType.numeric  == payment_sensebank_taxType ? 'selected="selected"' : '' }}>
+                                {{ taxType.numeric  == 0 ? taxType.alphabetic : taxType.alphabetic }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">
+                            {{ entry_FFDVersionFormat }}
+                        </label>
+                        <div class="col-sm-9">
+                            <select name="payment_sensebank_FFDVersion" class="form-control">
+                                {% for FFDVersion in FFDVersionList %}
+                                    <option value="{{ FFDVersion.value }}" {{ FFDVersion.value  == payment_sensebank_FFDVersion ? 'selected="selected"' : '' }}>
+                                        {{ FFDVersion.value  == 0 ? FFDVersion.title : FFDVersion.title }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- method -->
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">
+                            {{ entry_paymentMethod }}
+                        </label>
+                        <div class="col-sm-9">
+                            <select name="payment_sensebank_paymentMethodType" class="form-control">
+                                {% for ffd_paymentMethodType in ffd_paymentMethodTypeList %}
+                                    <option value="{{ ffd_paymentMethodType.numeric }}" {{ ffd_paymentMethodType.numeric  == payment_sensebank_paymentMethodType ? 'selected="selected"' : '' }}>
+                                        {{ ffd_paymentMethodType.value  == 0 ? ffd_paymentMethodType.alphabetic : ffd_paymentMethodType.alphabetic }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- method D-->
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">
+                            {{ entry_paymentMethodDelivery }}
+                        </label>
+                        <div class="col-sm-9">
+                            <select name="payment_sensebank_paymentMethodTypeDelivery" class="form-control">
+                                {% for ffd_paymentMethodType in ffd_paymentMethodTypeList %}
+                                    <option value="{{ ffd_paymentMethodType.numeric }}" {{ ffd_paymentMethodType.numeric  == payment_sensebank_paymentMethodTypeDelivery ? 'selected="selected"' : '' }}>
+                                        {{ ffd_paymentMethodType.value  == 0 ? ffd_paymentMethodType.alphabetic : ffd_paymentMethodType.alphabetic }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- object -->
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">
+                            {{ entry_paymentObject }}
+                        </label>
+                        <div class="col-sm-9">
+                            <select name="payment_sensebank_paymentObjectType" class="form-control">
+                                {% for ffd_paymentObjectType in ffd_paymentObjectTypeList %}
+                                    <option value="{{ ffd_paymentObjectType.numeric }}" {{ ffd_paymentObjectType.numeric  == payment_sensebank_paymentObjectType ? 'selected="selected"' : '' }}>
+                                        {{ ffd_paymentObjectType.value  == 0 ? ffd_paymentObjectType.alphabetic : ffd_paymentObjectType.alphabetic }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+{% endif %}
+
+{% if (enable_back_url_settings) %}
+                    <!-- backToShopURL -->
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="">
+                            {{ entry_backToShopURL }}
+                        </label>
+                        <div class="col-sm-9">
+                            <input type="text" name="payment_sensebank_backToShopURL" value="{{ payment_sensebank_backToShopURL }}" class="form-control" />
+                        </div>
+                    </div>
+{% endif %}
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">
+                            {{ entry_logging }}
+                        </label>
+                        <div class="col-sm-9">
+                            <select name="payment_sensebank_logging" class="form-control">
+                                <option value="1" {{ payment_sensebank_logging  == 1 ? 'selected="selected"' : '' }}>{{ logging_enabled }}</option>
+                                <option value="0" {{ payment_sensebank_logging  == 0 ? 'selected="selected"' : '' }}>{{ logging_disabled }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="">
+                            {{ entry_sortOrder }}
+                        </label>
+                        <div class="col-sm-9">
+                            <input type="text" name="payment_sensebank_sort_order" value="{{ payment_sensebank_sort_order }}" class="form-control" />
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{{ footer }}
